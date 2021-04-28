@@ -1,27 +1,33 @@
-#文件存储
-#domain: http://101.201.125.13:80/awall
-#domain: http://www.javae.cn:8088/awall
-domain: http://localhost/awall
-file:
-#  uploadPath: /app/tem/
-  uploadPath: E:/app/tem/
-  staticAccessPath: /awall/upload/**
-  accessPath: /upload/
-server:
-  port: 80
-spring:
-  datasource:
-#    username: root
+##文件存储
+#domain: http://localhost:8088/awall
+#file:
+#  uploadPath: E://app//
+#  staticAccessPath: /awall/upload/**
+#  accessPath: /upload/
+#server:
+#  port: 8088
+#spring:
+#  datasource:
+#    username: awall
 #    password: 123456
-    username: awall
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql:///awall
-    url: jdbc:mysql://81.70.207.162:3306/awall
-mybatis:
-  type-aliases-package: cn.awall.awalladmin.pojo
-  mapper-locations: classpath*:cn/awall/awalladmin/dao/*.xml
-
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://81.70.207.162:3306/awall
+#
+#  redis:
+#    host: 101.201.125.13
+#    port: 6379
+#    password: root
+#
+#
+#mybatis:
+#  type-aliases-package: cn.awall.awalladmin.pojo
+#  mapper-locations: classpath*:cn/awall/awalladmin/dao/*.xml
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.log4j.Log4jImpl
+#    map-underscore-to-camel-case: true
+#
+#
+#
 #logging:
 #  level:
 #    com:
@@ -29,3 +35,11 @@ mybatis:
 #        delivery:
 #          admin:
 #            mapper: debug
+#
+## 腾讯云短信接口
+#txsms:
+#  AppId: 1400496989
+#  AppKey: 7a36018f765e0d3c5b3cfa433001f655
+#  templateID: 894527
+#  signName: JavaE开发
+#  min: 5

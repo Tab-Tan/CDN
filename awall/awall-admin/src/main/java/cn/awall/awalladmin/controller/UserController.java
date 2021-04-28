@@ -3,9 +3,11 @@ package cn.awall.awalladmin.controller;
 import cn.awall.awalladmin.dao.UserMapper;
 import cn.awall.awalladmin.dto.UserInfoDO;
 import cn.awall.awalladmin.pojo.User;
-import cn.awall.awalladmin.service.RedisLoginService;
 import cn.awall.awalladmin.service.impl.UserServiceImpl;
-import cn.awall.awalladmin.utils.*;
+import cn.awall.awalladmin.utils.MobileUtils;
+import cn.awall.awalladmin.utils.RedisUtils;
+import cn.awall.awalladmin.utils.TxSmsTemplate;
+import cn.awall.awalladmin.utils.VerifyCode;
 import cn.awall.awalladmin.vo.CommonResult;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,7 +21,6 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +57,7 @@ public class UserController {
     @PostMapping("/awall/tel")
     public String isUser(@RequestBody Object data) throws JsonProcessingException {
 
-        Map<String,String> map = new ObjectMapper().readValue(JSON.toJSONString(data),Map.class);
+        Map<String, String> map = new ObjectMapper().readValue(JSON.toJSONString(data), Map.class);
         String tel = map.get("tel");
         if (!MobileUtils.isMobileNO(tel)) {
             return "手机号格式不正确！";
@@ -97,7 +98,7 @@ public class UserController {
         System.out.println(Msg);
 
         //将手机号和验证码放到Redis中
-        redisUtils.set(tel+yzm_reg, yzm, 300L);
+        redisUtils.set(tel + yzm_reg, yzm, 300L);
         return "短信发送成功";
     }
 
@@ -105,14 +106,14 @@ public class UserController {
     public String register(@RequestBody Object token) throws JsonProcessingException {
         System.out.println("用户注册");
         Map<String, String> map = new ObjectMapper().readValue(JSON.toJSONString(token), Map.class);
-        if (!map.get("code").equals(redisUtils.get(map.get("tel")+yzm_reg))) {
+        if (!map.get("code").equals(redisUtils.get(map.get("tel") + yzm_reg))) {
             return "验证码错误！";
         }
         User user = new User();
         user.setTel(map.get("tel"));
         user.setPassword(map.get("password"));
         user.setNikename(map.get("nikename"));
-        System.out.println("register controller:"+user);
+        System.out.println("register controller:" + user);
         boolean register = userService.register(user);
         if (register) {
             return "注册成功！";
@@ -142,11 +143,11 @@ public class UserController {
 
         Subject subject = SecurityUtils.getSubject();
         try {
-            subject.login(new UsernamePasswordToken(user.getTel(),user.getPassword()));
+            subject.login(new UsernamePasswordToken(user.getTel(), user.getPassword()));
             // 将当前会话的手机号存一波
             Long userId = userMapper.findUserByTel(user.getTel()).getUserId();
             user.setUserId(userId);
-            request.getSession().setAttribute("userId",String.valueOf(userId));
+            request.getSession().setAttribute("userId", String.valueOf(userId));
             return new CommonResult<>(200, "登录成功");
         } catch (AuthenticationException e) {
             e.printStackTrace();
@@ -175,7 +176,7 @@ public class UserController {
 
             System.out.println("randomText = " + randomText);
             //将验证码存入session
-            request.getSession().setAttribute("verifyCode",randomText);
+            request.getSession().setAttribute("verifyCode", randomText);
             response.setContentType("image/png");//必须设置响应内容类型为图片，否则前台不识别
 
             OutputStream os = response.getOutputStream(); //获取文件输出流
@@ -230,7 +231,7 @@ public class UserController {
         System.out.println(Msg);
 
         //将手机号和验证码放到Redis中
-        redisUtils.set(tel+yzm_reset, yzm, 300L);
+        redisUtils.set(tel + yzm_reset, yzm, 300L);
 
         return "短信发送成功";
     }
@@ -248,7 +249,7 @@ public class UserController {
             return "账号不存在，不允许重置密码!";
         }
 
-        if (!yzm.equals(redisUtils.get(user.getTel()+yzm_reset))) {
+        if (!yzm.equals(redisUtils.get(user.getTel() + yzm_reset))) {
             return "验证码错误！";
         }
 
@@ -266,22 +267,22 @@ public class UserController {
 
     @SneakyThrows
     @GetMapping("/awall/user/getUser/{id}")
-    public CommonResult<String> getUser(@PathVariable Long id){
+    public CommonResult<String> getUser(@PathVariable Long id) {
         User user = userService.getUser(id);
-        if (user!=null){
-            UserInfoDO userInfoDO = new UserInfoDO(user.getUserId(), user.getAc(),user.getTel(), user.getHeadImg(), user.getNikename(), user.getHeadImg());
+        if (user != null) {
+            UserInfoDO userInfoDO = new UserInfoDO(user.getUserId(), user.getAc(), user.getTel(), user.getHeadImg(), user.getNikename(), user.getHeadImg());
             String res = mapper.writeValueAsString(userInfoDO);
-            return new CommonResult<>(200,res);
-        }else {
-            return new CommonResult<>(500,"此用户不存在");
+            return new CommonResult<>(200, res);
+        } else {
+            return new CommonResult<>(500, "此用户不存在");
         }
     }
 
     @GetMapping("/awall/logout")
-    public boolean logout(HttpServletRequest request){
+    public boolean logout(HttpServletRequest request) {
         try {
             String userId = (String) request.getSession().getAttribute("userId");
-            if (userId!=null){
+            if (userId != null) {
                 request.getSession().removeAttribute("userId");
             }
         } catch (Exception e) {
@@ -293,7 +294,7 @@ public class UserController {
 
     // 是否登录
     @GetMapping("/awall/isLogin")
-    public String getLogin(HttpServletRequest request){
+    public String getLogin(HttpServletRequest request) {
         String userId = "";
 
         try {

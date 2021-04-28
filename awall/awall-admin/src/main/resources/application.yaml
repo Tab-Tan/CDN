@@ -1,32 +1,46 @@
+#文件存储
+domain: http://localhost:8088/awall
+file:
+  uploadPath: /app/tem/
+  staticAccessPath: /awall/upload/**
+  accessPath: /upload/
+server:
+  port: 8088
 spring:
+  datasource:
+    username: awall
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/awall
+
   # Redis连接
   redis:
     host: 101.201.125.13
-#    host: localhost
     port: 6379
     password: root
 
+
 mybatis:
   type-aliases-package: cn.awall.awalladmin.pojo
+  mapper-locations: classpath*:cn/awall/awalladmin/dao/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.log4j.Log4jImpl
     map-underscore-to-camel-case: true
 
-#logging:
-#  level:
-#    com:
-#      dandelion:
-#        delivery:
-#          admin:
-#            mapper: debug
+
+
+logging:
+  level:
+    com:
+      dandelion:
+        delivery:
+          admin:
+            mapper: debug
 
 # 腾讯云短信接口
 txsms:
   AppId: 1400496989
   AppKey: 7a36018f765e0d3c5b3cfa433001f655
   templateID: 894527
-  signName: lovelc网
+  signName: JavaE开发
   min: 5
-
-
-

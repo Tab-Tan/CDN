@@ -40,4 +40,9 @@ public class ArticleServiceImpl implements ArticleService {
     public void updateStar(Long id, Integer count) {
         articleMapper.updateStar(id, count);
     }
+
+    @Override
+    public List<Article> queryArticleByLimit(int n) {
+        return articleMapper.queryArticleByLimit(n);
+    }
 }

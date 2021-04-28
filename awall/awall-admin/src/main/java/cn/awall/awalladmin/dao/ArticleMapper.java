@@ -39,4 +39,7 @@ public interface ArticleMapper {
 
     // 修改点赞数量
     void updateStar(@Param("id") Long id, @Param("count") Integer count);
+
+    //按热度查询前n个
+    List<Article> queryArticleByLimit(int n);
 }

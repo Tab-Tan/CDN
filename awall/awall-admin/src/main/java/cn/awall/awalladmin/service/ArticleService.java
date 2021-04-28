@@ -18,4 +18,8 @@ public interface ArticleService {
     // 修改点赞数量
     void updateStar(Long id, Integer count);
 
+
+    //按热度查询前n个
+    List<Article> queryArticleByLimit(int n);
+
 }

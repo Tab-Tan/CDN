@@ -4,6 +4,8 @@ import cn.awall.awalladmin.enums.LikedCountStatusEnum;
 import cn.awall.awalladmin.enums.LikedStatusEnum;
 import cn.awall.awalladmin.service.LikedService;
 import cn.awall.awalladmin.service.RedisLikeService;
+import cn.awall.awalladmin.service.RedisLoginService;
+import cn.awall.awalladmin.utils.IpUtil;
 import cn.awall.awalladmin.vo.CommonResult;
 import cn.awall.awalladmin.vo.LikedDataVO;
 import com.fasterxml.jackson.databind.ObjectMapper;

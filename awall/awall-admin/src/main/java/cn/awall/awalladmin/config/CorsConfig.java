@@ -11,8 +11,10 @@ public class CorsConfig implements WebMvcConfigurer {
         //本应用的所有方法都会去处理跨域请求
         registry.addMapping("/**")
                 //允许远端访问的域名
+//                .allowedOrigins("http://101.201.125.13:8080")
+                .allowedOrigins("http://www.javae.cn")
+//                .allowedOrigins("http://localhost:80")
 //                .allowedOrigins("http://www.javae.cn")
-                .allowedOrigins("http://localhost:8080")
                 //允许请求的方法("POST", "GET", "PUT", "OPTIONS", "DELETE")
                 .allowedMethods("*")
                 //允许请求头

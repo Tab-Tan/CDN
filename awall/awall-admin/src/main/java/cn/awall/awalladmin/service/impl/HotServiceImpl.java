@@ -107,7 +107,7 @@ public class HotServiceImpl {
         Set<String> keys = redisTemplate.keys("*_hot_now");
         ArrayList<String> list = new ArrayList<>(keys);
         for (int i = 0; i < list.size(); i++) {
-            map.put(list.get(i), (Integer) redisUtils.get(list.get(i)));
+            map.put(list.get(i).split("_")[0], (Integer) redisUtils.get(list.get(i)));
         }
 
         LinkedHashMap<String, Integer> sortByValue = sortByValue(map, 0);

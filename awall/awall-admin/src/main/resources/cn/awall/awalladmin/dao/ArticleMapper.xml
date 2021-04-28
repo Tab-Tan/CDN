@@ -111,7 +111,7 @@
         from tb_article where article_id = #{ id };
     </select>
 
-    <select id="queryCountById" resultType="Long" parameterType="Long">
+    <select id="queryCountById" resultType="Long" parameterType="String">
     select count from tb_article where article_id = #{articleId}
     </select>
 
@@ -126,5 +126,9 @@
     <update id="updateStar">
         update tb_article set star = #{count} where article_id = #{id}
     </update>
+
+    <select id="queryArticleByLimit" resultType="Article" parameterType="int">
+        select * from tb_article order by count desc limit 0,#{n};
+    </select>
 </mapper>
 
