@@ -11,8 +11,11 @@ public interface ArticleService {
     int pubArticle(Article article);
     //分页查询
     List<Article> getArticlesByPage(int pageNum,int len);
-
+    // 通过id查询
     Article queryArticleById(Long id);
-
+    // 增加浏览量
     int countAdd(Long id);
+    // 修改点赞数量
+    void updateStar(Long id, Integer count);
+
 }

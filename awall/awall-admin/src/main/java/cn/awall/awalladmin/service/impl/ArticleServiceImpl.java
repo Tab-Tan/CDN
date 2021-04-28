@@ -35,4 +35,9 @@ public class ArticleServiceImpl implements ArticleService {
     public int countAdd(Long id) {
         return articleMapper.countInc(id);
     }
+
+    @Override
+    public void updateStar(Long id, Integer count) {
+        articleMapper.updateStar(id, count);
+    }
 }

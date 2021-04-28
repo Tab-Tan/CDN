@@ -30,9 +30,10 @@ public class ArticleController {
     @Resource
     private FileService fileService;
 
+
     //分页查询
     @SneakyThrows
-    @GetMapping("/articles/{page}/{len}")
+    @GetMapping("/awall/articles/{page}/{len}")
     public CommonResult queryByPage(@PathVariable int page,@PathVariable int len){
 
         ArrayList<ObjectNode> list = new ArrayList<>();
@@ -58,6 +59,7 @@ public class ArticleController {
             ObjectNode userNode = mapper.createObjectNode();
             userNode.put("nikeName",user.getNikename());
             userNode.put("rz",user.getAc());
+            userNode.put("userId",user.getUserId());
             userNode.put("url",user.getHeadImg());
             node.put("user",userNode);
             node.put("date",article.getDate().toString());
@@ -75,8 +77,8 @@ public class ArticleController {
 
     //分页查询
     @SneakyThrows
-    @GetMapping("/test/{page}/{len}")
-    public Map queryByPageTest(@PathVariable int page,@PathVariable int len){
+    @GetMapping("/awall/test/{page}/{len}")
+    public Map queryByPageTest(@PathVariable int page,@PathVariable int len,HttpServletRequest request){
 
         ArrayList<ObjectNode> list = new ArrayList<>();
         List<Article> articles = articleService.getArticlesByPage(page, len);
@@ -101,6 +103,7 @@ public class ArticleController {
             ObjectNode userNode = mapper.createObjectNode();
             userNode.put("nikeName",user.getNikename());
             userNode.put("rz",user.getAc());
+            userNode.put("userId",user.getUserId());
             userNode.put("url",user.getHeadImg());
             node.put("user",userNode);
             node.put("date",article.getDate().toString());
@@ -122,7 +125,7 @@ public class ArticleController {
     }
 
     @SneakyThrows
-    @GetMapping("/article/{id}")
+    @GetMapping("/awall/article/{id}")
     public CommonResult<String> queryArticleById(@PathVariable Long id){
 
         Article article = articleService.queryArticleById(id);
@@ -143,7 +146,8 @@ public class ArticleController {
         }
         String urls = sb.toString();
         ObjectNode userNode = mapper.createObjectNode();
-        userNode.put("nikeName",user.getNikename());
+        userNode.put("nikename",user.getNikename());
+        userNode.put("userId",user.getUserId());
         userNode.put("rz",user.getAc());
         userNode.put("img",user.getHeadImg());
         userNode.put("url","");
@@ -161,7 +165,7 @@ public class ArticleController {
 
     //发布文章
     @SneakyThrows
-    @PostMapping("/articles/pubArticle")
+    @PostMapping("/awall/articles/pubArticle")
     public CommonResult<String> pubArticle(@RequestBody Object obj, HttpServletRequest request){
 
         String userId = (String)request.getSession().getAttribute("userId");
@@ -194,4 +198,6 @@ public class ArticleController {
             return new CommonResult<>(500,"更新失败");
         }
     }
+
+
 }

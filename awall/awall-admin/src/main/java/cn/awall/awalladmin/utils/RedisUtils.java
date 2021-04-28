@@ -1,7 +1,9 @@
 package cn.awall.awalladmin.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -298,6 +300,10 @@ public final class RedisUtils {
         return redisTemplate.opsForHash().increment(key, item, -by);
     }
 
+    //==========================scan===============================
+    public Cursor<Map.Entry<Object,Object>> hscan(String key){
+        return redisTemplate.opsForHash().scan(key, ScanOptions.NONE);
+    }
 
     // ============================set=============================
 

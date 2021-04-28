@@ -1,26 +1,27 @@
 package cn.awall.awalladmin.controller;
 
 import cn.awall.awalladmin.dao.UserMapper;
+import cn.awall.awalladmin.dto.UserInfoDO;
 import cn.awall.awalladmin.pojo.User;
+import cn.awall.awalladmin.service.RedisLoginService;
 import cn.awall.awalladmin.service.impl.UserServiceImpl;
-import cn.awall.awalladmin.utils.MobileUtils;
-import cn.awall.awalladmin.utils.RedisUtils;
-import cn.awall.awalladmin.utils.TxSmsTemplate;
-import cn.awall.awalladmin.utils.VerifyCode;
+import cn.awall.awalladmin.utils.*;
 import cn.awall.awalladmin.vo.CommonResult;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -31,6 +32,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin
+@Slf4j
 public class UserController {
 
     @Autowired
@@ -45,12 +47,13 @@ public class UserController {
     @Autowired
     private ObjectMapper mapper;
 
+
     @Autowired
     private UserMapper userMapper;
     private String yzm_reg = "_yzm_reg";
     private String yzm_reset = "_yzm_reset";
 
-    @PostMapping("/tel")
+    @PostMapping("/awall/tel")
     public String isUser(@RequestBody Object data) throws JsonProcessingException {
 
         Map<String,String> map = new ObjectMapper().readValue(JSON.toJSONString(data),Map.class);
@@ -69,7 +72,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping("/sms")
+    @RequestMapping("/awall/sms")
     public String sms(String tel, HttpSession session) {
 
 //        检查无效手机号，减轻数据库负担，和验证码安全！
@@ -98,7 +101,7 @@ public class UserController {
         return "短信发送成功";
     }
 
-    @PostMapping("/register")
+    @PostMapping("/awall/register")
     public String register(@RequestBody Object token) throws JsonProcessingException {
         System.out.println("用户注册");
         Map<String, String> map = new ObjectMapper().readValue(JSON.toJSONString(token), Map.class);
@@ -120,41 +123,30 @@ public class UserController {
     }
 
 
-    @PostMapping("/login")
-    public CommonResult<String> login(HttpServletResponse response, @RequestBody Object object, HttpServletRequest request) throws JsonProcessingException {
-//
-//        response.addHeader("Access-Control-Allow-Origin", "http://localhost:8080");
-//        response.addHeader("Access-Control-Allow-Credentials", "true");
+    @PostMapping("/awall/login")
+    public CommonResult<String> login(@RequestBody Object object, HttpServletRequest request) throws JsonProcessingException {
 
-        //打印前端传来的对象
-        System.out.println("Object:" + JSON.toJSONString(object));
-
-        //打印服务器验证码
-//        System.out.println(session.getAttribute("verifyCode"));
-        System.out.println("yanzhengma1" + request.getSession().getAttribute("verifyCode"));
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, String> map = objectMapper.readValue(JSON.toJSONString(object), Map.class);
-        System.out.println(map.get("tel"));
-        System.out.println(map.get("password"));
-        System.out.println(map.get("code"));
+        Map<String, String> map = mapper.readValue(JSON.toJSONString(object), Map.class);
+        Cookie[] cookies = request.getCookies();
         User user = new User();
         String tel = map.get("tel");
         String password = map.get("password");
 
         user.setTel(tel);
         user.setPassword(password);
-
         if (!request.getSession().getAttribute("verifyCode").equals(map.get("code"))) {
             return new CommonResult<>(500, "验证码错误");
+        } else {
+            request.getSession().removeAttribute("verifyCode");
         }
-//        boolean login = userService.login(user);
+
         Subject subject = SecurityUtils.getSubject();
         try {
             subject.login(new UsernamePasswordToken(user.getTel(),user.getPassword()));
             // 将当前会话的手机号存一波
-
-            request.getSession().setAttribute("userId",String.valueOf(userMapper.findUserByTel(user.getTel()).getUserId()));
+            Long userId = userMapper.findUserByTel(user.getTel()).getUserId();
+            user.setUserId(userId);
+            request.getSession().setAttribute("userId",String.valueOf(userId));
             return new CommonResult<>(200, "登录成功");
         } catch (AuthenticationException e) {
             e.printStackTrace();
@@ -165,9 +157,8 @@ public class UserController {
 
     /* 获取验证码图片*/
 
-    @RequestMapping("/getVerifyCode")
+    @RequestMapping("/awall/getVerifyCode/{uuid}")
     public void getVerificationCode(HttpServletResponse response, HttpServletRequest request) {
-
         try {
             int width = 200;
             int height = 69;
@@ -182,9 +173,9 @@ public class UserController {
 
             //功能是生成验证码字符并加上噪点，干扰线，返回值为验证码字符
 
-            request.getSession().setAttribute("verifyCode", randomText);
             System.out.println("randomText = " + randomText);
-
+            //将验证码存入session
+            request.getSession().setAttribute("verifyCode",randomText);
             response.setContentType("image/png");//必须设置响应内容类型为图片，否则前台不识别
 
             OutputStream os = response.getOutputStream(); //获取文件输出流
@@ -202,7 +193,7 @@ public class UserController {
 
     }
 
-    @PostMapping("/resettel")
+    @PostMapping("/awall/resettel")
     public String resetisUser(String tel) {
 
         if (!MobileUtils.isMobileNO(tel)) return "手机号格式不正确！";
@@ -214,7 +205,7 @@ public class UserController {
         else return "OK！";
     }
 
-    @RequestMapping("/resetsms")
+    @RequestMapping("/awall/resetsms")
     public String resetsms(String tel, HttpSession session) {
 
         //检查无效手机号，减轻数据库负担，和验证码安全！
@@ -244,7 +235,7 @@ public class UserController {
         return "短信发送成功";
     }
 
-    @RequestMapping("/reset")
+    @RequestMapping("/awall/reset")
     public String reset(User user, String yzm) {
 
         //检查无效手机号，减轻数据库负担，和验证码安全！
@@ -274,27 +265,44 @@ public class UserController {
     }
 
     @SneakyThrows
-    @PostMapping("/user/getUser/{id}")
+    @GetMapping("/awall/user/getUser/{id}")
     public CommonResult<String> getUser(@PathVariable Long id){
         User user = userService.getUser(id);
         if (user!=null){
-            String res = mapper.writeValueAsString(user);
+            UserInfoDO userInfoDO = new UserInfoDO(user.getUserId(), user.getAc(),user.getTel(), user.getHeadImg(), user.getNikename(), user.getHeadImg());
+            String res = mapper.writeValueAsString(userInfoDO);
             return new CommonResult<>(200,res);
         }else {
             return new CommonResult<>(500,"此用户不存在");
         }
     }
 
-    // 是否登录
-    @GetMapping("/isLogin")
-    public boolean isLogin(HttpServletRequest request){
+    @GetMapping("/awall/logout")
+    public boolean logout(HttpServletRequest request){
         try {
-            Long.valueOf((String) request.getSession().getAttribute("userId"));
-        } catch (NumberFormatException e) {
+            String userId = (String) request.getSession().getAttribute("userId");
+            if (userId!=null){
+                request.getSession().removeAttribute("userId");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
         return true;
+    }
+
+    // 是否登录
+    @GetMapping("/awall/isLogin")
+    public String getLogin(HttpServletRequest request){
+        String userId = "";
+
+        try {
+            userId = (String) request.getSession().getAttribute("userId");
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return "";
+        }
+        return userId;
     }
 
 

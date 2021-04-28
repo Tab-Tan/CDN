@@ -4,14 +4,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.awall.awalladmin.dao.ProtectMapper">
 
+    <resultMap id="protectMap" type="protect">
+        <id column="protect_id" property="protectId" />
+        <result column="title" property="title" />
+        <result column="status" property="status" />
+        <result column="article_id" property="articleId" />
+    </resultMap>
+
     <insert id="addProtect" parameterType="Protect">
         insert into tb_protect(protect_id, title, status, article_id)
-            VALUE (
-                   #{protect_id},
-                   #{title},
-                   #{status},
-                   #{articleId}
-            )
+            values (#{protect_id},#{title},#{status},#{articleId})
     </insert>
 
     <delete id="deleteProtectById" parameterType="Long">
@@ -57,6 +59,11 @@
                 and article_id = #{articleId}
             </if>
         </where>
+    </select>
+
+    <select id="selectProtectByPage" resultMap="protectMap">
+        select protect_id, title, status, article_id
+        from tb_protect limit #{start},#{len};
     </select>
 
 </mapper>

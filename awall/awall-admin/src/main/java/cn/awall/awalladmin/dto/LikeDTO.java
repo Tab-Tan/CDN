@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LikeDTO {
-    //id
-    private String likeId;
     //用户id
     private String likedUserId;
     //被点赞文章id

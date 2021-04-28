@@ -122,5 +122,9 @@
     <update id="countInc" parameterType="Long">
         update tb_article set count = count+1 where article_id = #{articleId}
     </update>
+
+    <update id="updateStar">
+        update tb_article set star = #{count} where article_id = #{id}
+    </update>
 </mapper>
 

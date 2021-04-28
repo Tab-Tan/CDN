@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@CrossOrigin
 @RestController
 public class FileController {
 
@@ -36,7 +37,7 @@ public class FileController {
     @Resource
     Gson gson;
 
-    @Value("${file.upload-path}")
+    @Value("${file.uploadPath}")
     private String realBasePath;
 
     @Value("${file.accessPath}")
@@ -46,7 +47,7 @@ public class FileController {
     private String domain;
 
     // 上传栏目url
-    @PostMapping("/upload")
+    @PostMapping("/awall/upload")
     public CommonResult<String> uploadImg(@RequestParam(required=false) MultipartFile file, HttpServletRequest req) throws IOException, ServletException {
 
         String imgSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().indexOf('.')+1);
@@ -83,7 +84,7 @@ public class FileController {
         return new CommonResult<>(200,res);
     }
     // 内容图片接口
-    @PostMapping("/paper/upload")
+    @PostMapping("/awall/paper/upload")
     //linux
     public String pageUpload(@RequestParam(required=false) MultipartFile file,HttpServletRequest req) throws FileNotFoundException {
         String imgSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().indexOf('.')+1);
@@ -93,7 +94,7 @@ public class FileController {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String today = dateFormat.format(todayDate);
         // 域名访问的相对路径（通过浏览器访问的链接-虚拟路径）
-        String saveToPath = accessPath + today + "/";
+            String saveToPath = accessPath + today + "/";
         // 真实路径，实际储存的路径
         String realPath = realBasePath + today + "/";
         // 储存文件的物理路径，使用本地路径储存
@@ -109,7 +110,7 @@ public class FileController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String url = "http://localhost:8080"+saveToPath+fileName;
+        String url = "http://101.201.125.13:80/awall/"+saveToPath+fileName;
         UFile uFile = new UFile(url, filepath);
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String username = (String) SecurityUtils.getSubject().getPrincipal();
@@ -149,7 +150,7 @@ public class FileController {
     }
 
     //内容列表
-    @GetMapping("/file/list")
+    @GetMapping("/awall/file/list")
     public String getList(Integer page,Integer limit){
 
         int count = fileService.queryAll().size();

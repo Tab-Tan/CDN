@@ -1,9 +1,10 @@
 spring:
   # Redis连接
   redis:
-#    host: 81.70.207.162
-    host: localhost
+    host: 101.201.125.13
+#    host: localhost
     port: 6379
+    password: root
 
 mybatis:
   type-aliases-package: cn.awall.awalladmin.pojo
@@ -11,20 +12,20 @@ mybatis:
     log-impl: org.apache.ibatis.logging.log4j.Log4jImpl
     map-underscore-to-camel-case: true
 
-logging:
-  level:
-    com:
-      dandelion:
-        delivery:
-          admin:
-            mapper: debug
+#logging:
+#  level:
+#    com:
+#      dandelion:
+#        delivery:
+#          admin:
+#            mapper: debug
 
 # 腾讯云短信接口
 txsms:
   AppId: 1400496989
   AppKey: 7a36018f765e0d3c5b3cfa433001f655
   templateID: 894527
-  signName: lovelc网a
+  signName: lovelc网
   min: 5
 
 

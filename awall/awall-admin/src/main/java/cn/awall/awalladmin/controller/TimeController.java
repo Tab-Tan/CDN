@@ -4,6 +4,7 @@ import cn.awall.awalladmin.pojo.Obj;
 import cn.awall.awalladmin.service.impl.ObjServiceImpl;
 import cn.awall.awalladmin.service.impl.TrainServiceImpl;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -11,6 +12,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin
 @Controller
 public class TimeController {
 
@@ -20,13 +22,13 @@ public class TimeController {
     @Resource
     private ObjServiceImpl objServiceImpl;
 
-    @RequestMapping("/index")
+    @RequestMapping("/awall/index")
     public String index() {
         return "index";
     }
 
 
-    @RequestMapping("/time")
+    @RequestMapping("/awall/time")
     @ResponseBody
     public String time(String school, String entrance, String train, String obj) {
         System.out.println("school = " + school);

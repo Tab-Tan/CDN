@@ -2,6 +2,7 @@ package cn.awall.awalladmin.dao;
 
 import cn.awall.awalladmin.pojo.Article;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -35,4 +36,7 @@ public interface ArticleMapper {
 
     //浏览量+1
     public int countInc(Long articleId);
+
+    // 修改点赞数量
+    void updateStar(@Param("id") Long id, @Param("count") Integer count);
 }

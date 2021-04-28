@@ -1,6 +1,8 @@
 package cn.awall.awalladmin.utils;
 
 import cn.awall.awalladmin.dao.ArticleMapper;
+import cn.awall.awalladmin.service.LikedService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,6 +15,7 @@ import java.util.Set;
 
 @Configuration      //1.主要用于标记配置类，兼备Component的效果。
 @EnableScheduling   // 2.开启定时任务
+@Slf4j
 public class SaticScheduleTask {
 
     @Autowired
@@ -20,6 +23,9 @@ public class SaticScheduleTask {
 
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private LikedService likedService;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -54,6 +60,14 @@ public class SaticScheduleTask {
             }
         }
 
+    }
+
+    // 点赞定时任务
+    @Scheduled(cron = "0 0/5 * * * *")
+    private void likeTask(){
+        log.info("持久化点赞数据");
+        likedService.transLikedFromRedis2DB();
+        likedService.transLikedCountFromRedis2DB();
     }
 }
 
